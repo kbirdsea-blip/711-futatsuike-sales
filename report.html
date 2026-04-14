@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<script>
+  // Auth guard - redirect to login if not authenticated
+  (function(){
+    if (sessionStorage.getItem('ft_auth_ok') !== '1') {
+      window.location.replace('index.html');
+    }
+  })();
+</script>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>販促セール・トピックス一覧｜横浜鶴見二ツ池店</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=DM+Mono:wght@500&display=swap');
+
+  :root {
+    --red:    #e8002d;
+    --green:  #006934;
+    --orange: #f97316;
+    --amber:  #f59e0b;
+    --sky:    #0ea5e9;
+    --slate:  #334155;
+    --bg:     #f8f9fa;
+    --card:   #ffffff;
+    --border: #e2e8f0;
+    --text:   #1e293b;
+    --muted:  #64748b;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ── ヘッダー ── */
+  header {
+    background: var(--red);
+    padding: 18px 24px 14px;
+    display: flex;
+    align-items: flex-end;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  header .logo {
+    font-size: 1.6rem;
+    font-weight: 900;
+    color: #fff;
+    letter-spacing: -.5px;
+    line-height: 1;
+  }
+  header .logo span { color: #ffe08a; }
+  header .meta {
+    font-size: .78rem;
+    color: rgba(255,255,255,.85);
+    line-height: 1.6;
+  }
+  header .badge-week {
+    margin-left: auto;
+    background: #fff;
+    color: var(--red);
+    font-weight: 700;
+    font-size: .8rem;
+    padding: 4px 12px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+
+  /* ── タブナビ ── */
+  nav.tabs {
+    display: flex;
+    gap: 4px;
+    padding: 14px 20px 0;
+    background: #fff;
+    border-bottom: 2px solid var(--border);
+    overflow-x: auto;
+  }
+  nav.tabs button {
+    padding: 8px 18px;
+    border: none;
+    background: transparent;
+    font-family: inherit;
+    font-size: .85rem;
+    font-weight: 700;
+    color: var(--muted);
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: color .15s, border-color .15s;
+  }
+  nav.tabs button.active {
+    color: var(--red);
+    border-bottom-color: var(--red);
+  }
+  nav.tabs button:hover:not(.active) { color: var(--slate); }
+
+  /* ── コンテンツ ── */
+  main { max-width: 900px; margin: 0 auto; padding: 20px 16px 60px; }
+
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* ── セクションタイトル ── */
+  .sec-title {
+    font-size: .7rem;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 24px 0 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .sec-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ── サマリーカード ── */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+    gap: 10px;
+    margin-bottom: 4px;
+  }
+  .kpi-card {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px 12px;
+  }
+  .kpi-card .kpi-label {
+    font-size: .7rem;
+    color: var(--muted);
+    font-weight: 500;
+    margin-bottom: 4px;
+  }
+  .kpi-card .kpi-val {
+    font-size: 1.45rem;
+    font-weight: 900;
+    font-family: 'DM Mono', monospace;
+    line-height: 1;
+  }
+  .kpi-card .kpi-sub {
+    font-size: .7rem;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+  .kpi-up   { color: var(--sky); }
+  .kpi-ok   { color: var(--green); }
+  .kpi-warn { color: var(--amber); }
+  .kpi-bad  { color: var(--red); }
+
+  /* ── プロモーションカード ── */
+  .promo-list { display: flex; flex-direction: column; gap: 12px; }
+
+  .promo-card {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: 6px 1fr;
+  }
+  .promo-card .accent { background: var(--red); }
+  .promo-card .accent.green  { background: var(--green); }
+  .promo-card .accent.orange { background: var(--orange); }
+  .promo-card .accent.sky    { background: var(--sky); }
+  .promo-card .accent.amber  { background: var(--amber); }
+
+  .promo-card .body {
+    padding: 14px 16px 14px;
+  }
+  .promo-card .promo-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+  }
+  .promo-card .promo-title {
+    font-size: .97rem;
+    font-weight: 700;
+  }
+  .tag {
+    font-size: .65rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 10px;
+    white-space: nowrap;
+    letter-spacing: .04em;
+  }
+  .tag-red    { background: #fee2e2; color: var(--red); }
+  .tag-green  { background: #dcfce7; color: var(--green); }
+  .tag-orange { background: #ffedd5; color: var(--orange); }
+  .tag-sky    { background: #e0f2fe; color: #0369a1; }
+  .tag-amber  { background: #fef3c7; color: #92400e; }
+  .tag-slate  { background: #f1f5f9; color: var(--slate); }
+
+  .promo-period {
+    font-size: .72rem;
+    color: var(--muted);
+    font-weight: 500;
+    margin-bottom: 8px;
+    font-family: 'DM Mono', monospace;
+  }
+  .promo-desc {
+    font-size: .82rem;
+    color: var(--slate);
+    line-height: 1.7;
+  }
+
+  /* ── アイテム表 ── */
+  .item-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: .8rem;
+    margin-top: 8px;
+  }
+  .item-table th {
+    text-align: left;
+    padding: 5px 8px;
+    background: #f8fafc;
+    color: var(--muted);
+    font-weight: 600;
+    font-size: .7rem;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  .item-table td {
+    padding: 6px 8px;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  .item-table tr:last-child td { border-bottom: none; }
+  .price-after  { font-weight: 700; color: var(--red); font-family: 'DM Mono', monospace; }
+  .price-before { color: var(--muted); text-decoration: line-through; font-family: 'DM Mono', monospace; font-size: .75rem; }
+  .discount     { color: var(--orange); font-weight: 700; font-size: .75rem; }
+
+  /* ── トピックスカード ── */
+  .topic-card {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 18px;
+    display: grid;
+    grid-template-columns: 32px 1fr;
+    gap: 0 12px;
+    align-items: start;
+  }
+  .topic-icon {
+    font-size: 1.4rem;
+    line-height: 1;
+    margin-top: 2px;
+  }
+  .topic-title {
+    font-size: .95rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .topic-body { font-size: .82rem; color: var(--slate); line-height: 1.7; }
+  .topic-body strong { color: var(--text); }
+  .topic-body .hi    { color: var(--red); font-weight: 700; }
+  .topic-body .ok    { color: var(--green); font-weight: 700; }
+  .topic-list { list-style: none; margin-top: 6px; display: flex; flex-direction: column; gap: 4px; }
+  .topic-list li::before { content: '▸ '; color: var(--red); font-size: .75rem; }
+
+  /* ── 重点商品グリッド ── */
+  .item-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px;
+  }
+  .item-card {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+  }
+  .item-card .cat-label {
+    font-size: .62rem;
+    font-weight: 700;
+    color: var(--muted);
+    letter-spacing: .05em;
+    margin-bottom: 4px;
+  }
+  .item-card .item-name {
+    font-size: .84rem;
+    font-weight: 700;
+    line-height: 1.4;
+    margin-bottom: 6px;
+  }
+  .item-card .item-price {
+    font-family: 'DM Mono', monospace;
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--red);
+  }
+  .item-card .item-qty {
+    font-size: .7rem;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+  .item-card.highlight {
+    border-color: var(--red);
+    background: #fff8f8;
+  }
+  .item-card.highlight .item-name { color: var(--red); }
+
+  /* ── 新規商品順位 ── */
+  .rank-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    gap: 10px;
+  }
+  .rank-card {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+  }
+  .rank-card .rname {
+    font-size: .8rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    line-height: 1.4;
+  }
+  .rank-bar-wrap { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+  .rank-label  { font-size: .65rem; color: var(--muted); width: 48px; flex-shrink: 0; }
+  .rank-bar { flex: 1; height: 8px; background: #f1f5f9; border-radius: 4px; overflow: hidden; }
+  .rank-bar-fill { height: 100%; border-radius: 4px; }
+  .fill-store { background: var(--red); }
+  .fill-do    { background: #94a3b8; }
+  .rank-num { font-size: .72rem; font-weight: 700; font-family: 'DM Mono', monospace; min-width: 28px; text-align: right; }
+  .rank-num.store { color: var(--red); }
+
+  /* ── フッター ── */
+  footer {
+    text-align: center;
+    padding: 16px;
+    font-size: .7rem;
+    color: var(--muted);
+    border-top: 1px solid var(--border);
+    margin-top: 8px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="logo">🏪 <span>暪嵜趴覯二跳池店</span></div>
+    <div class="meta">販促セール・トピックス一覧　|　2026年4月 鶴見DO</div>
+  </div>
+  <div style="display:flex;align-items:center;gap:8px;margin-left:auto;"><div class="badge-week">4/13週〜4/26週</div>
+  <script>
+  function doLogout(){
+    sessionStorage.removeItem('ft_auth_ok');
+    window.location.replace('index.html');
+  }
+  </script>
+</header>
+
+<nav class="tabs">
+  <button class="active" onclick="switchTab('sale',this)">🏷 販促セール</button>
+  <button onclick="switchTab('topics',this)">📋 トピックス</button>
+  <button onclick="switchTab('items',this)">📦 4/20週 重点商品</button>
+  <button onclick="switchTab('rank',this)">🏆 新規商品順位</button>
+</nav>
+
+<main>
+
+<!-- ════════ 販促セール ════════ -->
+<div id="tab-sale" class="section active">
+
+  <div class="sec-title">実施中・近日実施</div>
+  <div class="promo-list">
+
+    <!-- 揚げ物まとめ買い -->
+    <div class="promo-card">
+      <div class="accent red"></div>
+      <div class="body">
+        <div class="promo-head">
+          <span class="promo-title">🍗 揚げ物まとめ買いセール</span>
+          <span class="tag tag-red">実施中</span>
+          <span class="tag tag-slate">セール</span>
+        </div>
+        <div class="promo-period">📅 4/15（水）〜 4/21（火）</div>
+        <div class="promo-desc">
+          対象の揚げ物を1度に<strong>2個購入で50円引き</strong>、<strong>3個購入で100円引き</strong>。<br>
+          ※対象品を1度に2個買うと2個目から割引（組み合わせ自由）。
+        </div>
+      </div>
+    </div>
+
+    <!-- アイスクリームセール -->
+    <div class="promo-card">
+      <div class="accent sky"></div>
+      <div class="body">
+        <div class="promo-head">
+          <span class="promo-title">🍦 アイスクリームお買い得セール</span>
+          <span class="tag tag-sky">来週実施</span>
+          <span class="tag tag-slate">値引きセール</span>
+        </div>
+        <div class="promo-period">📅 4/23（木）〜 4/25（水）　対象5アイテム</div>
+        <table class="item-table">
+          <thead>
+            <tr><th>商品名</th><th>通常</th><th>値引後</th><th>値引</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>赤城 ガリガリ君ソーダ</td>
+              <td class="price-before">90円</td>
+              <td class="price-after">70円</td>
+              <td class="discount">−20円</td>
+            </tr>
+            <tr>
+              <td>明治ブルガリア ヨーグルトデザート</td>
+              <td class="price-before">180円</td>
+              <td class="price-after">150円</td>
+              <td class="discount">−30円</td>
+            </tr>
+            <tr>
+              <td>ロッテ クーリッシュ バニラ</td>
+              <td class="price-before">180円</td>
+              <td class="price-after">150円</td>
+              <td class="discount">−30円</td>
+            </tr>
+            <tr>
+              <td>森永 バリバリバー バニラ</td>
+              <td class="price-before">450円</td>
+              <td class="price-after">380円</td>
+              <td class="discount">−70円</td>
+            </tr>
+            <tr>
+              <td>森永 パルム チョコレートマルチ</td>
+              <td class="price-before">610円</td>
+              <td class="price-after">520円</td>
+              <td class="discount">−90円</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="promo-desc" style="margin-top:8px;">
+          💡 特別原価も設定済み（利益面でも活用可）。対象3アイテムは<strong>集中陳列</strong>推奨（マルチも同様）。<br>
+          📌 「給料日（外出増）＋気温上昇＋GW」の販促を組み合わせて販売増を狙う。
+        </div>
+      </div>
+    </div>
+
+    <!-- 冷凍食品 -->
+    <div class="promo-card">
+      <div class="accent orange"></div>
+      <div class="body">
+        <div class="promo-head">
+          <span class="promo-title">🧊 冷凍食品まとめ買い 200円引き</span>
+          <span class="tag tag-orange">4月末限定</span>
+        </div>
+        <div class="promo-period">📅 4月末限定</div>
+        <div class="promo-desc">
+          冷凍食品を<strong>3個買うと200円引き</strong>。月末の買いまとめ需要に訴求。
+        </div>
+      </div>
+    </div>
+
+    <!-- アプリ駄菓子クーポン -->
+    <div class="promo-card">
+      <div class="accent green"></div>
+      <div class="body">
+        <div class="promo-head">
+          <span class="promo-title">📱 アプリ限定 週末「駄菓子」無料クーポン</span>
+          <span class="tag tag-green">毎週土曜配布</span>
+        </div>
+        <div class="promo-period">📅 毎週土曜・日曜に1枚　（配布→翌日曜まで使用可）</div>
+        <table class="item-table">
+          <thead><tr><th>配布日</th><th>無料商品</th></tr></thead>
+          <tbody>
+            <tr><td>4/4（土）</td><td>おつみ 1個</td></tr>
+            <tr><td>4/11（土）</td><td>ナチョルチョコ 1個</td></tr>
+            <tr><td>4/18（土）</td><td>ガブリチュウグレープ 1個</td></tr>
+            <tr><td>4/25（土）</td><td>チュパチャップス いちご 1個</td></tr>
+          </tbody>
+        </table>
+        <div class="promo-desc" style="margin-top:8px;">
+          💡 nananoボーナス・PayPayポイント・ゲージ・マイル・アプリ販促と連動して活用。
+        </div>
+      </div>
+    </div>
+
+    <!-- 7NOW -->
+    <div class="promo-card">
+      <div class="accent amber"></div>
+      <div class="body">
+        <div class="promo-head">
+          <span class="promo-title">🚚 7NOW 盛盛割引</span>
+          <span class="tag tag-amber">デリバリー</span>
+        </div>
+        <div class="promo-period">📅 4/13〜4/19週 ／ 4/20〜4/26週</div>
+        <div class="promo-desc">
+          7NOWデリバリーで対象商品が割引。アプリ販促と連動して活用。
+        </div>
+      </div>
+    </div>
+
+    <!-- フライチ今週 -->
+    <div class="promo-card">
+      <div class="accent red"></div>
+      <div class="body">
+        <div class="promo-head">
+          <span class="promo-title">🔖 今週のフライチ（引換）</span>
+          <span class="tag tag-red">今週</span>
+          <span class="tag tag-slate">フライチ</span>
+        </div>
+        <div class="promo-desc">
+          ザバスプロテイン脂肪0（460502）、サントリーNOPE（460359）、明治ガルボポケット/抹茶（321085/321086/322271/321135）、
+          アサヒシニアアイスルド＆クールドライヤード/カテキンミント（320537/322759/323047）、
+          日清ヨーグルグル400鉄分/400ミラクルケア（210079/210131/210427）、
+          クリーム玄米ブランヨーグルト/メープル（480372/480175）、サッポロ一番塩担々麺（347536）、
+          キッコーマン豆乳コーヒー・ ジョア・ケフィア各種（347543）
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /promo-list -->
+</div>
+
+<!-- ════════ トピックス ════════ -->
+<div id="tab-topics" class="section">
+
+  <div class="sec-title">4/6週 実績サマリー</div>
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-label">売上前鹴比</div>
+      <div class="kpi-val kpi-ok">100.3<span style="font-size:.7rem">%</span></div>
+      <div class="kpi-sub">DO鹳均 98.8%　✅ 超過</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">タバコ除く売上前鹴比</div>
+      <div class="kpi-val kpi-ok">101.5<span style="font-size:.7rem">%</span></div>
+      <div class="kpi-sub">実質的にも堅調</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">客数前鹴比</div>
+      <div class="kpi-val kpi-warn">99.8<span style="font-size:.7rem">%</span></div>
+      <div class="kpi-sub">DO平均 97.8%　⚠ やや減</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">客単価前年比</div>
+      <div class="kpi-val kpi-ok">102.0<span style="font-size:.7rem">%</span></div>
+      <div class="kpi-sub">インフレ効果含む</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">キャッシュレス率</div>
+      <div class="kpi-val kpi-bad">52.8<span style="font-size:.7rem">%</span></div>
+      <div class="kpi-sub">DO平均 60.5%　🔴 要改善</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">アプリ客数利用率</div>
+      <div class="kpi-val kpi-warn">10.4<span style="font-size:.7rem">%</span></div>
+      <div class="kpi-sub">DO鹳均 10.9%</div>
+    </div>
+  </div>
+
+  <div class="sec-title">重要トピックス</div>
+  <div class="promo-list">
+
+    <!-- 気温上昇 -->
+    <div class="topic-card">
+      <div class="topic-icon">🌡️</div>
+      <div>
+        <div class="topic-title">
+          気温上昇対応【最重要】
+          <span class="tag tag-red">要対応</span>
+        </div>
+        <div class="topic-body">
+          日曜日以降<strong>25℃近くまで上昇</strong>見込み。デイリー・非デイリー両面で事前対応が必要。<br><br>
+          <strong>需要シフト実績（東東京ZO参考）：</strong>
+          <ul class="topic-list" style="margin-top:4px;">
+            <li>アイスコーヒー比率：3/24週 38% → 4/21週 <span class="hi">48%（+10pt）</span></li>
+            <li>調理麺→カップ麺比率：3/24週 50% → 4/21週 <span class="hi">66%（+16pt）</span></li>
+            <li>全国デイリー・非デイリー販売金額ともに4月から急伸中</li>
+          </ul>
+          <br>🔑 <strong>気温対応商品バーコードリストを事前発注に活用すること。</strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- 冷製パスタ欠品 -->
+    <div class="topic-card">
+      <div class="topic-icon">🍝</div>
+      <div>
+        <div class="topic-title">
+          冷製パスタ 欠品注意
+          <span class="tag tag-orange">要発注増</span>
+        </div>
+        <div class="topic-body">
+          新規の冷製パスタが平均<strong>2.6個/日</strong>売れている。<br>
+          特に<span class="hi">「海老とトマトのクリーム」は欠品率41.1%</span>と非常に高い状況。<br>
+          → 発注数を早急に引き上げること。
+        </div>
+      </div>
+    </div>
+
+    <!-- サラダ欠品 -->
+    <div class="topic-card">
+      <div class="topic-icon">🥗</div>
+      <div>
+        <div class="topic-title">
+          サラダ 慢性的な欠品
+          <span class="tag tag-orange">要対応</span>
+        </div>
+        <div class="topic-body">
+          単日だけでなく<strong>日頃から欠品率が高い状況</strong>。<br>
+          気温上昇でさらにサラダ需要が増加する見通し。構造的な発注見直しが必要。
+        </div>
+      </div>
+    </div>
+
+    <!-- 冷やし中華 -->
+    <div class="topic-card">
+      <div class="topic-icon">🍜</div>
+      <div>
+        <div class="topic-title">
+          調理麺：冷やし中華 納品逆転
+          <span class="tag tag-amber">要確認</span>
+        </div>
+        <div class="topic-body">
+          <span class="hi">昨年対比でまだ足りていない</span>（上位単品の導入率が100%ではない）。<br>
+          <strong>冷やし中華の納品販売が逆転</strong>しており、発注の見直しが必要。<br>
+          → 気温上昇で需要が急増する前に対応すること。
+        </div>
+      </div>
+    </div>
+
+    <!-- 菓子パン好調 -->
+    <div class="topic-card">
+      <div class="topic-icon">🥐</div>
+      <div>
+        <div class="topic-title">
+          菓子パンRe 販売好調継続
+          <span class="tag tag-green">好調</span>
+        </div>
+        <div class="topic-body">
+          <ul class="topic-list">
+            <li>分類 菓子パン前年比：<span class="ok">102.6%</span></li>
+            <li>PMA ベストリー：<span class="ok">109.1%</span></li>
+            <li>自店（4/6〜4/12直近週）：販売金額前年比 <span class="ok">111.5%</span>（急上昇中）</li>
+          </ul>
+          引き続き陳列量・発注量を維持・拡大すること。
+        </div>
+      </div>
+    </div>
+
+    <!-- POS上位好調 -->
+    <div class="topic-card">
+      <div class="topic-icon">📈</div>
+      <div>
+        <div class="topic-title">POS-PMA 好調カテゴリ（前年差上位）</div>
+        <div class="topic-body">
+          <ul class="topic-list">
+            <li>タバコ：<span class="ok">+6.5千円</span>（PMA1位）</li>
+            <li>ベストリー：<span class="ok">+4.3千円</span></li>
+            <li>ソフトドリンク：<span class="ok">+2.9千円</span>（気温上昇で更なる伸びに期待）</li>
+            <li>ビール：<span class="ok">+2.5千円</span></li>
+            <li>アイスクリーム（DO比較）：<span class="ok">+4.4千円</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- POS下位要注意 -->
+    <div class="topic-card">
+      <div class="topic-icon">📉</div>
+      <div>
+        <div class="topic-title">
+          POS-PMA 要注意カテゴリ（前年差下位）
+          <span class="tag tag-red">要改善</span>
+        </div>
+        <div class="topic-body">
+          <ul class="topic-list">
+            <li>玩具：<span class="hi">−4.4千円</span>（最大マイナス）</li>
+            <li>牛乳・乳飲料：<span class="hi">−3.3千円</span></li>
+            <li>FFカップ：<span class="hi">−2.6千円</span></li>
+            <li>加工食品：<span class="hi">−2.5千円</span></li>
+            <li>米飯：<span class="hi">−2.5千円</span></li>
+          </ul>
+          米飯・乳飲料は天候・季節起因の可能性あり。玩具は構造的課題として継続注視。
+        </div>
+      </div>
+    </div>
+
+    <!-- キャッシュレス -->
+    <div class="topic-card">
+      <div class="topic-icon">💳</div>
+      <div>
+        <div class="topic-title">
+          キャッシュレス率 DO鹳均を大幅下回り
+          <span class="tag tag-red">改善急務</span>
+        </div>
+        <div class="topic-body">
+          自店 <strong>52.8%</strong> vs DO鹳均 <strong>60.5%</strong>（差：−7.7pt）。<br>
+          PayPay利用率は 30.4%（DO鹳均25.8%）と優位だが、全体のキャッシュレス比率底上げが課題。<br>
+          → レジ応対ではQR・タッチ決済誘導を強化すること。
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ════════ 重点商品 ════════ -->
+<div id="tab-items" class="section">
+
+  <div class="sec-title">4/20（月）発注開始　重点商品一覧</div>
+
+  <div style="margin-bottom:14px;">
+    <span class="tag tag-red" style="font-size:.72rem;padding:4px 10px;">★ ハイライト：重点推奨品</span>
+    <span style="font-size:.75rem;color:var(--muted);margin-left:8px;">価格は税抜表示</span>
+  </div>
+
+  <div class="item-grid">
+
+    <div class="item-card">
+      <div class="cat-label">🍱 米飯</div>
+      <div class="item-name">てりたまハンバーグおむすび</div>
+      <div class="item-price">238円</div>
+      <div class="item-qty">推奨15個</div>
+    </div>
+
+    <div class="item-card">
+      <div class="cat-label">🥗 麺類その他</div>
+      <div class="item-name">あつあつオーブン焼き 国産ブロッコリー</div>
+      <div class="item-price">298円</div>
+      <div class="item-qty">推奨6個</div>
+    </div>
+
+    <div class="item-card">
+      <div class="cat-label">🥖 デリカ</div>
+      <div class="item-name">ガーリックラスク</div>
+      <div class="item-price">178円</div>
+      <div class="item-qty">推奨8個</div>
+    </div>
+
+    <div class="item-card">
+      <div class="cat-label">🍛 デリカテッセン</div>
+      <div class="item-name">7プレミアムゴールド 金のビーフカレー</div>
+      <div class="item-price">398円</div>
+      <div class="item-qty">推奨8個</div>
+    </div>
+
+    <div class="item-card highlight">
+      <div class="cat-label">🍔 デリカテッセン　★注目</div>
+      <div class="item-name">7プレミアムゴールド 金のハンバーグ</div>
+      <div class="item-price">398円</div>
+      <div class="item-qty">推奨 <strong>10個</strong>　品揃え中</div>
+    </div>
+
+    <div class="item-card">
+      <div class="cat-label">🍰 スイーツ</div>
+      <div class="item-name">クワトロいちごエクレア</div>
+      <div class="item-price">398円</div>
+      <div class="item-qty">推奨8個</div>
+    </div>
+
+    <div class="item-card">
+      <div class="cat-label">🍢 FF</div>
+      <div class="item-name">揚げたこ焼き 3個入り</div>
+      <div class="item-price">198円</div>
+      <div class="item-qty">4/13発注開始</div>
+    </div>
+
+    <div class="item-card">
+      <div class="cat-label">🥛 牛乳乳飲料</div>
+      <div class="item-name">7Pのむヨーグルト コクうまプレーン270</div>
+      <div class="item-price">205円</div>
+      <div class="item-qty">推奨10個</div>
+    </div>
+
+    <div class="item-card">
+      <div class="cat-label">🥛 牛乳乳飲料</div>
+      <div class="item-name">7Pのむヨーグルト コクうまプレーン180</div>
+      <div class="item-price">145円</div>
+      <div class="item-qty">推奨7個</div>
+    </div>
+
+    <div class="item-card">
+      <div class="cat-label">🧊 冷凍食品</div>
+      <div class="item-name">7プレミアム 濃厚G系ラーメン</div>
+      <div class="item-price">798円</div>
+      <div class="item-qty">—</div>
+    </div>
+
+    <div class="item-card highlight">
+      <div class="cat-label">🍦 アイスクリーム　★注目</div>
+      <div class="item-name">7Pワッフルコーン 抹茶ミルク</div>
+      <div class="item-price">328円</div>
+      <div class="item-qty">推奨 <strong>2ロット</strong></div>
+    </div>
+
+    <div class="item-card highlight">
+      <div class="cat-label">🍵 アイスクリーム　★注目</div>
+      <div class="item-name">ナナズグリーンティー 抹茶パフェ</div>
+      <div class="item-price">388円</div>
+      <div class="item-qty">推奨 <strong>2ロット</strong>　品揃え中</div>
+    </div>
+
+    <div class="item-card">
+      <div class="cat-label">🍵 アイスクリーム</div>
+      <div class="item-name">森菓 匠茶最中</div>
+      <div class="item-price">348円</div>
+      <div class="item-qty">推奨—</div>
+    </div>
+
+    <div class="item-card highlight">
+      <div class="cat-label">🍜 加工食品　★注目</div>
+      <div class="item-name">7プレミアム 琉球そば</div>
+      <div class="item-price">158円</div>
+      <div class="item-qty">推奨 <strong>2ロット</strong></div>
+    </div>
+
+    <div class="item-card">
+      <div class="cat-label">🍬 菓子</div>
+      <div class="item-name">不二家 ミルキーラムネ</div>
+      <div class="item-price">160円</div>
+      <div class="item-qty">—</div>
+    </div>
+
+    <div class="item-card">
+      <div class="cat-label">🍟 菓子</div>
+      <div class="item-name">カルビー プロ野球チップス2027第1弾</div>
+      <div class="item-price">135円</div>
+      <div class="item-qty">—</div>
+    </div>
+
+    <div class="item-card">
+      <div class="cat-label">🤖 菓子</div>
+      <div class="item-name">SDガンダム Gジェネレーションスナック01</div>
+      <div class="item-price">168円</div>
+      <div class="item-qty">—</div>
+    </div>
+
+    <div class="item-card">
+      <div class="cat-label">🥚 菓子</div>
+      <div class="item-name">フルタ チョコエッグ 名探偵コナン6</div>
+      <div class="item-price">280円</div>
+      <div class="item-qty">—</div>
+    </div>
+
+  </div>
+
+  <div class="sec-title" style="margin-top:24px;">特発（4/20週）</div>
+  <div class="promo-card">
+    <div class="accent amber"></div>
+    <div class="body">
+      <div class="promo-desc">
+        ❶ 一番くじ ワンピース エルバフ編 GIANT2（8/7・8納品）<br>
+        ❷ ニッコリーノ × サンリオコラボ<br>
+        ❸ MOJOJOJO関連
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ 新規商品順位 ════════ -->
+<div id="tab-rank" class="section">
+
+  <div class="sec-title">4/6週 新規商品販売順位　暪嵜趴見二ツ池（鶴見地区）</div>
+
+  <div class="rank-grid">
+
+    <div class="rank-card">
+      <div class="rname">サクふわメロンパン</div>
+      <div class="rank-bar-wrap">
+        <span class="rank-label">自店</span>
+        <div class="rank-bar"><div class="rank-bar-fill fill-store" style="width:100%"></div></div>
+        <span class="rank-num store">47個</span>
+      </div>
+      <div class="rank-bar-wrap">
+        <span class="rank-label">地区平均</span>
+        <div class="rank-bar"><div class="rank-bar-fill fill-do" style="width:94%"></div></div>
+        <span class="rank-num">44個</span>
+      </div>
+      <div style="font-size:.7rem;color:var(--green);margin-top:4px;font-weight:700;">▲ 地区平均超え</div>
+    </div>
+
+    <div class="rank-card">
+      <div class="rname">ずっしりデニッシュリンゴ</div>
+      <div class="rank-bar-wrap">
+        <span class="rank-label">自店</span>
+        <div class="rank-bar"><div class="rank-bar-fill fill-store" style="width:100%"></div></div>
+        <span class="rank-num store">51個</span>
+      </div>
+      <div class="rank-bar-wrap">
+        <span class="rank-label">地区平均</span>
+        <div class="rank-bar"><div class="rank-bar-fill fill-do" style="width:75%"></div></div>
+        <span class="rank-num">38個</span>
+      </div>
+      <div style="font-size:.7rem;color:var(--green);margin-top:4px;font-weight:700;">▲ 地区平均大幅超え</div>
+    </div>
+
+    <div class="rank-card">
+      <div class="rname">サッポロ一番しょうゆ味 リュウジ薬膳にんにく</div>
+      <div class="rank-bar-wrap">
+        <span class="rank-label">自店</span>
+        <div class="rank-bar"><div class="rank-bar-fill fill-store" style="width:100%"></div></div>
+        <span class="rank-num store">32個</span>
+      </div>
+      <div class="rank-bar-wrap">
+        <span class="rank-label">地区平均</span>
+        <div class="rank-bar"><div class="rank-bar-fill fill-do" style="width:75%"></div></div>
+        <span class="rank-num">24個</span>
+      </div>
+      <div style="font-size:.7rem;color:var(--green);margin-top:4px;font-weight:700;">▲ 地区平均超え</div>
+    </div>
+
+    <div class="rank-card">
+      <div class="rname">よくばりサンド ハム&コールスロー</div>
+      <div class="rank-bar-wrap">
+        <span class="rank-label">自店</span>
+        <div class="rank-bar"><div class="rank-bar-fill fill-store" style="width:100%"></div></div>
+        <span class="rank-num store">23個</span>
+      </div>
+      <div class="rank-bar-wrap">
+        <span class="rank-label">地区平均</span>
+        <div class="rank-bar"><div class="rank-bar-fill fill-do" style="width:61%"></div></div>
+        <span class="rank-num">14個</span>
+      </div>
+      <div style="font-size:.7rem;color:var(--green);margin-top:4px;font-weight:700;">▲ 地区平均超え</div>
+    </div>
+
+    <div class="rank-card">
+      <div class="rname">一本釣り 鰹だし香る 石臼挽きそば粉ざるそば</div>
+      <div class="rank-bar-wrap">
+        <span class="rank-label">自店</span>
+        <div class="rank-bar"><div class="rank-bar-fill fill-store" style="width:100%"></div></div>
+        <span class="rank-num store">24個</span>
+      </div>
+      <div class="rank-bar-wrap">
+        <span class="rank-label">地区平均</span>
+        <div class="rank-bar"><div class="rank-bar-fill fill-do" style="width:71%"></div></div>
+        <span class="rank-num">17個</span>
+      </div>
+      <div style="font-size:.7rem;color:var(--green);margin-top:4px;font-weight:700;">▲ 地区平均超え</div>
+    </div>
+
+    <div class="rank-card">
+      <div class="rname">ブラックニッカ クリアハイボール缶350ml</div>
+      <div class="rank-bar-wrap">
+        <span class="rank-label">自店</span>
+        <div class="rank-bar"><div class="rank-bar-fill fill-store" style="width:20%"></div></div>
+        <span class="rank-num store">4個</span>
+      </div>
+      <div class="rank-bar-wrap">
+        <span class="rank-label">地区平均</span>
+        <div class="rank-bar"><div class="rank-bar-fill fill-do" style="width:25%"></div></div>
+        <span class="rank-num">5個</span>
+      </div>
+      <div style="font-size:.7rem;color:var(--amber);margin-top:4px;font-weight:700;">⚠ 地区平均以下</div>
+    </div>
+
+    <div class="rank-card">
+      <div class="rname">7プレミアム まるで完熟マンゴー</div>
+      <div class="rank-bar-wrap">
+        <span class="rank-label">自店前年比</span>
+        <div class="rank-bar"><div class="rank-bar-fill fill-store" style="width:100%"></div></div>
+        <span class="rank-num store">29個</span>
+      </div>
+      <div class="rank-bar-wrap">
+        <span class="rank-label">地区前年比</span>
+        <div class="rank-bar"><div class="rank-bar-fill fill-do" style="width:48%"></div></div>
+        <span class="rank-num">14個</span>
+      </div>
+      <div style="font-size:.7rem;color:var(--green);margin-top:4px;font-weight:700;">▲ 大幅超え（前年比）</div>
+    </div>
+
+  </div>
+
+  <div class="sec-title" style="margin-top:20px;">次週重点商品（参考）</div>
+  <div class="promo-card">
+    <div class="accent slate" style="background:#94a3b8"></div>
+    <div class="body">
+      <div class="promo-desc">
+        ① ライスバーガー　② チョコがけロール　③ コーヒー牛乳プリン　④ とみた冷し豚まぜ麺<br>
+        ⑤ アサヒゴールド 350ml・500ml　⑥ エースブタメン BIG とんこつ味　⑦ 3Dフルーツポップス　⑧ 7Pチョコっとグミ白桃味
+      </div>
+    </div>
+  </div>
+
+</div><!-- /section -->
+
+</main>
+
+<footer>横浜鶴見二ツ池店　2026年4月　販促セール・トピックス一覧　｜　社内・オーナー様限り</footer>
+
+<script>
+function switchTab(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('nav.tabs button').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+</body>
+</html>
