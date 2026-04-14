@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ログイン｜鶴見二ツ池店 販売管理サイト</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Noto Sans JP', sans-serif; background: linear-gradient(135deg, #e8002d 0%, #b0001e 60%, #1a1a1a 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+  .card { background: #fff; border-radius: 16px; padding: 44px 40px 36px; width: 100%; max-width: 400px; box-shadow: 0 20px 60px rgba(0,0,0,.35); }
+  .logo-area { text-align: center; margin-bottom: 28px; }
+  .logo-strip { display: inline-flex; border-radius: 8px; overflow: hidden; border: 3px solid #e8002d; }
+  .logo-strip span { display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 900; line-height: 1; width: 52px; height: 52px; }
+  .s7-r { background: #e8002d; color: #fff; } .s7-g { background: #006934; color: #fff; } .s7-o { background: #f97316; color: #fff; }
+  .store-name { margin-top: 14px; font-size: 1.05rem; font-weight: 700; color: #1e293b; }
+  .site-label { font-size: .78rem; color: #64748b; margin-top: 4px; }
+  h2 { font-size: 1.1rem; font-weight: 700; color: #1e293b; margin-bottom: 22px; text-align: center; padding-top: 8px; border-top: 1px solid #e2e8f0; }
+  label { display: block; font-size: .8rem; font-weight: 700; color: #475569; margin-bottom: 6px; margin-top: 16px; }
+  input[type=text], input[type=password] { width: 100%; padding: 11px 14px; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: .95rem; font-family: inherit; outline: none; }
+  input:focus { border-color: #e8002d; box-shadow: 0 0 0 3px rgba(232,0,45,.12); }
+  .btn { display: block; width: 100%; margin-top: 26px; padding: 13px; background: #e8002d; color: #fff; border: none; border-radius: 10px; font-family: inherit; font-size: 1rem; font-weight: 700; cursor: pointer; }
+  .btn:hover { background: #c0001e; }
+  .error { display: none; background: #fff1f2; border: 1px solid #fecdd3; color: #be123c; border-radius: 8px; padding: 10px 14px; font-size: .83rem; margin-top: 16px; text-align: center; }
+  .error.show { display: block; }
+  footer { margin-top: 28px; text-align: center; font-size: .72rem; color: #94a3b8; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo-area">
+    <div class="logo-strip"><span class="s7-r">7</span><span class="s7-g">-</span><span class="s7-o">Ⅱ</span></div>
+    <div class="store-name">横浜鶴見二ツ池店</div>
+    <div class="site-label">販売管理サイト</div>
+  </div>
+  <h2>🔐 スタッフログイン</h2>
+  <form onsubmit="doLogin(event)">
+    <label>ログインID</label>
+    <input type="text" id="uid" autocomplete="username" placeholder="IDを入力" autofocus>
+    <label>パスワード</label>
+    <input type="password" id="pw" autocomplete="current-password" placeholder="パスワードを入力">
+    <div class="error" id="err">⚠️ IDまたはパスワードが正しくありません</div>
+    <button class="btn" type="submit">ログイン</button>
+  </form>
+  <footer>横浜鶴見二ツ池店　スタッフ専用　©2026</footer>
+</div>
+<script>
+  const _k='ft_auth_ok';
+  if(sessionStorage.getItem(_k)==='1'){window.location.replace('report.html');}
+  function doLogin(e){
+    e.preventDefault();
+    var uid=document.getElementById('uid').value.trim();
+    var pw=document.getElementById('pw').value;
+    if(uid===atob('ZnV0YXRzdWlrZQ==')&&pw===atob('ZnV0YXRzdWlrZUBAMzQ2NTA4')){
+      sessionStorage.setItem(_k,'1');
+      window.location.replace('report.html');
+    }else{
+      document.getElementById('err').classList.add('show');
+      document.getElementById('pw').value='';
+    }
+  }
+</script>
+</body>
+</html>
